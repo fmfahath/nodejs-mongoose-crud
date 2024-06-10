@@ -30,4 +30,4 @@ async function getDatabase() {
         })
 }
 
-module.exports = getDatabase;
+module.exports = { getDatabase }

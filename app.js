@@ -3,17 +3,25 @@ const app = express();
 const bodyparser = require('body-parser');
 const exhbs = require('express-handlebars');
 const dbo = require('./db');
-const ObjectID = dbo.ObjectID;
+const bookModel = require('./models/bookModel')
+// const ObjectID = dbo.ObjectID;
 
+
+//connect database
+dbo.getDatabase();
+
+//view engine
 app.engine('hbs', exhbs.engine({ layoutsDir: 'views/', defaultLayout: 'main', extname: 'hbs' }))
 app.set('view engine', 'hbs')
 app.set('views', 'views')
 
+
+//parse body
 app.use(bodyparser.urlencoded({ extended: true }))
 
-
+//middlewares / routes
 app.get('/', async (req, res) => {
-    let database = await dbo.getDatabase();
+    // let database = await dbo.getDatabase();
     const collection = database.collection('books')
     const cursor = collection.find({})
     let booksDetails = await cursor.toArray();
@@ -56,7 +64,7 @@ app.get('/', async (req, res) => {
 app.post('/store_book', async (req, res) => {
     let book = { title: req.body.title, author: req.body.author };
 
-    let database = await dbo.getDatabase();
+    // let database = await dbo.getDatabase();
     const collection = database.collection('books')
     await collection.insertOne(book)
     return res.redirect('/?status=1');
