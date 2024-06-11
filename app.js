@@ -3,7 +3,7 @@ const app = express();
 const bodyparser = require('body-parser');
 const exhbs = require('express-handlebars');
 const dbo = require('./db');
-const bookModel = require('./models/bookModel')
+const BookModel = require('./models/bookModel')
 // const ObjectID = dbo.ObjectID;
 
 
@@ -11,7 +11,15 @@ const bookModel = require('./models/bookModel')
 dbo.getDatabase();
 
 //view engine
-app.engine('hbs', exhbs.engine({ layoutsDir: 'views/', defaultLayout: 'main', extname: 'hbs' }))
+app.engine('hbs', exhbs.engine({
+    layoutsDir: 'views/',
+    defaultLayout: 'main',
+    extname: 'hbs',
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+}))
 app.set('view engine', 'hbs')
 app.set('views', 'views')
 
@@ -21,10 +29,14 @@ app.use(bodyparser.urlencoded({ extended: true }))
 
 //middlewares / routes
 app.get('/', async (req, res) => {
+    //read data
     // let database = await dbo.getDatabase();
-    const collection = database.collection('books')
-    const cursor = collection.find({})
-    let booksDetails = await cursor.toArray();
+    // const collection = database.collection('books')
+    // const cursor = collection.find({})
+    // let booksDetails = await cursor.toArray();
+
+    //read data
+    const booksDetails = await BookModel.find({})
 
     let message = "";
     let edit_id, edit_book;
@@ -62,11 +74,15 @@ app.get('/', async (req, res) => {
 
 //insert
 app.post('/store_book', async (req, res) => {
-    let book = { title: req.body.title, author: req.body.author };
+    // let book = { title: req.body.title, author: req.body.author };
 
     // let database = await dbo.getDatabase();
-    const collection = database.collection('books')
-    await collection.insertOne(book)
+    // const collection = database.collection('books')
+    // await collection.insertOne(book)
+
+    const book = new BookModel({ title: req.body.title, author: req.body.author })
+    book.save();
+
     return res.redirect('/?status=1');
 })
 
